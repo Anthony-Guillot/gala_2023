@@ -1,0 +1,30 @@
+services:
+  api:
+    depends_on:
+      - bdd
+    image : node
+    ports:
+     - 3000:3000
+    volumes:
+      - ./api_src:/code
+    working_dir : /code
+    command: npm run watch
+    env_file:
+      - .env
+
+  bdd:
+    volumes:
+      - dbvolume:/var/lib/mysql
+    image: mariadb
+    restart: always
+    env_file:
+      - .env
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+  
+volumes:
+  dbvolume :
