@@ -1,3 +1,5 @@
+version : "3.1"
+
 services:
   api:
     depends_on:
@@ -8,7 +10,7 @@ services:
     volumes:
       - ./api_src:/code
     working_dir : /code
-    command: npm run watch
+    command: npm run ${MODE}
     env_file:
       - .env
 

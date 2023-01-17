@@ -4,7 +4,7 @@ const router = express.Router();
 const {body, validationResult, matchedData} = require('express-validator');
 
 const {Party, Consumable} = require('../model/bddTables')
-const {ConsumerSchemas} = require('../model/schemas')
+const {ConsumableSchemas} = require('../model/schemas')
 
 router.post('/', 
 body('name').isString().notEmpty().trim().escape(),
@@ -24,7 +24,7 @@ async function(req, res) {
 
     if(check_party_exist === null){
         res.status(404).json({err : "This party does not exist"});
-        return 
+        return next()
     }
 
     const {generateConsumableUUid} = require("../model/generateUUID");
@@ -35,7 +35,7 @@ async function(req, res) {
 
     if(check_consumable_exist !== null){
         res.status(409).json({err : "This consumable already exists"});
-        return 
+        return next() 
     }
 
     const ret = await Consumable.create({...body, uuid : potential_uuid, party_id : check_party_exist.id,});  
@@ -44,5 +44,25 @@ async function(req, res) {
 
 });
 
+router.get(
+    '/',
+    body('party_uuid'),
+
+    async function(req, res) {
+
+        const body = matchedData(req, {locations : ['body'], includeOptionals: true });
+        const check_party_exist = await Party.findOne({where : {uuid : body.party_uuid}})
+
+        if(check_party_exist === null){
+        res.status(404).json({err : "This party does not exist"});
+       return next() 
+    }
+
+        const consumables = await Consumable.findAll({attributes : ConsumableSchemas.explicit,
+            where : {party_id : check_party_exist.id}})
+        
+        res.status(200).json(consumables);
+    }
+)
 
 module.exports = router

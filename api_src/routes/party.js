@@ -27,7 +27,7 @@ async function(req, res) {
 
     if(check_exist !== null){
         res.status(409).json({err : "This party already exists", check_exist : check_exist})
-        return 
+        return next()  
     }
 
     const ret = await Party.create({name : body.name, description : body.description || "" , uuid : potential_uuid})

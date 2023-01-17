@@ -7,7 +7,8 @@ const ConsumerSchemas = {
 }
 
 const ConsumableSchemas = {
-    condensed : ['uuid', 'name', 'max_cons']
+    condensed : ['uuid', 'name', 'max_cons'],
+    explicit : ['uuid', 'name', 'max_cons', 'description']
 }
 
 module.exports = {PartySchemas, ConsumerSchemas, ConsumableSchemas}
