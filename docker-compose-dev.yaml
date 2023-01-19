@@ -1,6 +1,21 @@
 version : "3.1"
 
 services:
+  dashboard:
+    depends_on:
+      - api
+    image : node
+    ports:
+     - 5000:5173
+    volumes:
+      - ./dashboard:/code
+    working_dir : /code
+    command: npm run dev 
+    env_file:
+      - .env
+    environment:
+      - PUBLIC_ENV=${ENV}
+  
   api:
     depends_on:
       - bdd
@@ -10,7 +25,7 @@ services:
     volumes:
       - ./api_src:/code
     working_dir : /code
-    command: npm run ${MODE}
+    command: npm run ${MODE} 
     env_file:
       - .env
 
@@ -26,7 +41,7 @@ services:
     image: adminer
     restart: always
     ports:
-      - 8080:8080
+      - 9090:8080
   
 volumes:
   dbvolume :

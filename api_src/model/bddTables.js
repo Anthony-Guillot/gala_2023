@@ -124,9 +124,8 @@ const ConsumptionTracking = sequelize.define('ConsomptionTracking',
     }, { freezeTableName: true });
 
 
-const db_mode = process.env.CONTEXT == 'dev' ? { force: true } : { alter: true };
-
-sequelize.sync(db_mode).then(() => {
+const db_mode = process.env.ENV == 'developpement' ? { force: true } : { alter: true };
+const sync = () => sequelize.sync(db_mode).then(() => {
 
     Party.hasMany(Consumer, { foreignKey: 'party_id' });
     Party.hasMany(Consumable, { foreignKey: 'party_id' });
@@ -143,10 +142,10 @@ sequelize.sync(db_mode).then(() => {
     ConsumptionTracking.belongsTo(Consumable, { foreignKey: 'consumable_id' })
 
 
-    if (process.env.CONTEXT == 'dev') {
+    if (process.env.ENV == 'developpement') {
         const { loadFixtures } = require("../fixtures");
         loadFixtures();
     }
 })
 
-module.exports = { Party, Consumable, Consumer, ConsumptionTracking }
+module.exports = { Party, Consumable, Consumer, ConsumptionTracking, sync}

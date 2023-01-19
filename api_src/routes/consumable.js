@@ -1,7 +1,10 @@
 const express = require('express');
+const cors = require('../bin/getCors');
 
 const router = express.Router();
-const {body, validationResult, matchedData} = require('express-validator');
+router.use(cors);
+
+const {body, query, validationResult, matchedData} = require('express-validator');
 
 const {Party, Consumable} = require('../model/bddTables')
 const {ConsumableSchemas} = require('../model/schemas')
@@ -46,12 +49,12 @@ async function(req, res) {
 
 router.get(
     '/',
-    body('party_uuid'),
+    query('party_uuid'),
 
     async function(req, res) {
 
-        const body = matchedData(req, {locations : ['body'], includeOptionals: true });
-        const check_party_exist = await Party.findOne({where : {uuid : body.party_uuid}})
+        const query = matchedData(req, {locations : ['query'], includeOptionals: true });
+        const check_party_exist = await Party.findOne({where : {uuid : query.party_uuid}})
 
         if(check_party_exist === null){
         res.status(404).json({err : "This party does not exist"});

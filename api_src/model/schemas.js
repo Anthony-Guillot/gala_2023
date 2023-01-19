@@ -1,5 +1,6 @@
 const PartySchemas = {
     condensed : ['uuid', 'name', 'description'],
+    explicit : ['uuid', 'name', 'description', 'createdAt']
 }
 
 const ConsumerSchemas = {

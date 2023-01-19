@@ -1,5 +1,9 @@
 var express = require('express');
+
+const cors = require('../bin/getCors');
 const router = express.Router();
+
+router.use(cors);
 
 const { body, validationResult, matchedData } = require('express-validator');
 const { Consumer, Consumable, ConsumptionTracking } = require('../model/bddTables');
@@ -11,23 +15,20 @@ router.patch('/consume',
   async function (req, res, next) {
 
     if (!validationResult(req).isEmpty()) {
-      res.status(400).json({ err: "Bad format" });
-      return next();
+      return next({message : "Bad format", status : 400});
     }
 
     const body = matchedData(req, { locations: ['body'], includeOptionals: true });
 
     const check_consumer_exist = await Consumer.findOne({ where: { uuid: body.consumer_uuid } });
     if (check_consumer_exist == null) {
-      res.status(404).json({ err: "This consumer doesn't exists" });
-      return next();
+      return next({message : "This consumer doesn't exists", status : 404});
     }
 
     const check_consumable_exist = await Consumable.findOne({ where: { uuid: body.consumable_uuid } });
 
     if (check_consumable_exist == null) {
-      res.status(404).json({ err: "This consumable doesn't exists" });
-      return next();
+      return next({message : "This consumable doesn't exists", status : 404});
     }
 
     const [consumption_tracking, created] = await ConsumptionTracking.findOrCreate({
@@ -45,8 +46,7 @@ router.patch('/consume',
 
 
     if(consumption_tracking.consumption_count == consumable.max_cons){
-      res.status(409).json({ err: "Max cons" });
-      return next();
+      return next({message : "Max cons", status : 409});
     }
 
     consumption_tracking.increment('consumption_count', { by: 1 });

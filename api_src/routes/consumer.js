@@ -1,7 +1,9 @@
 const express = require('express');
+const cors = require('../bin/getCors');
 
 const router = express.Router();
-const {body, param, validationResult, matchedData} = require('express-validator');
+router.use(cors);
+const {body, query, param, validationResult, matchedData} = require('express-validator');
 
 
 const {Party, Consumer, ConsumptionTracking, Consumable} = require('../model/bddTables')
@@ -12,7 +14,7 @@ router.post('/',
 body('name').isString().notEmpty().trim().escape(),
 body('party_uuid').isUUID(), 
 
-async function(req, res) {  
+async function(req, res, next) {  
     
     if(!validationResult(req).isEmpty()){
         res.status(400).json({err : "Bad format"});
@@ -45,14 +47,14 @@ async function(req, res) {
 });
 
 router.get('/',
-body('party_uuid').isUUID(),
-async function(req, res) {  
+query('party_uuid').isUUID().notEmpty(),
+async function(req, res, next) {  
 
     if(!validationResult(req).isEmpty()){
-        res.status(400).json({err : "Bad format"});
+        return next({message : "Bad format", status : 400});
     }
 
-    const body = matchedData(req, {locations : ['body'], includeOptionals: true });
+    const query = matchedData(req, {includeOptionals: true });
 
     const consumers = await Consumer.findAll({
         attributes : ConsumerSchemas.condensed,
@@ -60,13 +62,11 @@ async function(req, res) {
             model: Party,
             attributes: [],
             where: {
-                uuid: body.party_uuid,
+                uuid: query.party_uuid,
             }
         }
     
 })
-
-    console.log(consumers)
 
     res.status(200).json(consumers);
 }
@@ -99,7 +99,8 @@ async function(req, res, next) {
     const consumer_info_query = `SELECT Consumers.uuid as 'uuid', Consumers.name as 'name', Consumables.uuid as 'consumable.uuid', COALESCE(ConsomptionTracking.consumption_count, 0) as 'consumable.count', Consumables.max_cons as 'consumable.max_cons', Consumables.name as 'consumable.name'
     FROM Consumers
     CROSS JOIN Consumables
-    LEFT JOIN ConsomptionTracking ON Consumers.id = ConsomptionTracking.consumer_id AND Consumables.id = ConsomptionTracking.consumable_id;`
+    LEFT JOIN ConsomptionTracking ON Consumers.id = ConsomptionTracking.consumer_id AND Consumables.id = ConsomptionTracking.consumable_id
+    WHERE ;`
 
     const db = require("../bin/getDb");
 
@@ -114,7 +115,6 @@ async function(req, res, next) {
     let i = 0;
     while(ret_db[i] != null ){
         response_data.consumables[i] = ret_db[i].consumable;
-        console.log(response_data);
         i++;
     }
     
