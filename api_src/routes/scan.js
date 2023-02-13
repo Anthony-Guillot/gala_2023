@@ -36,7 +36,7 @@ router.patch('/consume',
       defaults: {
         consumable_id: check_consumable_exist.id,
         consumable_id: check_consumer_exist.id,
-        consumtion_count: 0
+        consumption_count: 0
       }
     });
 

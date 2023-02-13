@@ -20,6 +20,7 @@ services:
     depends_on:
       - bdd
     image : node
+    restart : always
     ports:
      - 3000:3000
     volumes:
@@ -39,9 +40,8 @@ services:
 
   adminer:
     image: adminer
-    restart: always
     ports:
       - 9090:8080
-  
+ 
 volumes:
   dbvolume :

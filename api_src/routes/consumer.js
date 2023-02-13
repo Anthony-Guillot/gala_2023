@@ -100,7 +100,7 @@ async function(req, res, next) {
     FROM Consumers
     CROSS JOIN Consumables
     LEFT JOIN ConsomptionTracking ON Consumers.id = ConsomptionTracking.consumer_id AND Consumables.id = ConsomptionTracking.consumable_id
-    WHERE ;`
+    WHERE Consumers.uuid = $consumer_uuid;`
 
     const db = require("../bin/getDb");
 
