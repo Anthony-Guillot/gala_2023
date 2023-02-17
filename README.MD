@@ -52,9 +52,9 @@ L'api est accessible à l'adresse suivante :
 
 |Route               |Méthode    |Paramètres            |Body                             |
 |---                 |:-:        |:-:                   |:-:                              | 
-|/consumer/{uuid}    |  GET      |                      |                                 |
+|/consumer/{qrcode}  |  GET      |                      |                                 |
 |/consumer/          |  GET      |party_uuid={uuid}     |                                 |
-|/consumer/          |  POST     |                      |name, party_uuid                 |
+|/consumer/          |  POST     |                      |name, party_uuid, qrcode         |
 
 ### Consommables
 
@@ -67,4 +67,4 @@ L'api est accessible à l'adresse suivante :
 
 |Route               |Méthode    |Paramètres            |Body                             |
 |---                 |:-:        |:-:                   |:-:                              | 
-|/scan/consume       |  PATCH    |                      |consumable_uuid, consumable_uuid |
+|/scan/consume       |  PATCH    |                      |consumable_uuid, qrcode          |
