@@ -13,6 +13,7 @@ const {ConsumerSchemas, ConsumableSchemas} = require('../model/schemas')
 router.post('/', 
 body('name').isString().notEmpty().trim().escape(),
 body('party_uuid').isUUID(), 
+body('qrcode').isString().notEmpty().trim().escape(),
 
 async function(req, res, next) {  
     
@@ -40,7 +41,7 @@ async function(req, res, next) {
         return next()  
     }
 
-    const ret = await Consumer.create({name : body.name, uuid : potential_uuid, party_id : check_party_exist.id});
+    const ret = await Consumer.create({name : body.name, uuid : potential_uuid, party_id : check_party_exist.id, qrcode : body.qrcode});
     
     res.status(201).json({uuid : ret.uuid});
 
@@ -72,9 +73,9 @@ async function(req, res, next) {
 }
 );
 
-router.get('/:consumer_uuid', 
+router.get('/:qrcode', 
 
-param('consumer_uuid').isUUID(),
+param('qrcode').isString(),
 
 async function(req, res, next) {  
 
@@ -86,7 +87,60 @@ async function(req, res, next) {
     const consumer = await Consumer.findOne({
         attributes : ConsumerSchemas.condensed,
             where: {
-                uuid: req.params.consumer_uuid,
+                qrcode: req.params.qrcode,
+            }
+        });
+
+
+    if(consumer == null){
+        res.status(404).json({err : "This consumer doesn't exist"});
+        return next()
+    }
+
+    const consumer_info_query = `SELECT Consumers.uuid as 'uuid', Consumers.name as 'name', Consumers.qrcode as 'qrcode', Consumables.uuid as 'consumable.uuid', COALESCE(ConsomptionTracking.consumption_count, 0) as 'consumable.count', Consumables.max_cons as 'consumable.max_cons', Consumables.name as 'consumable.name'
+    FROM Consumers
+    CROSS JOIN Consumables
+    LEFT JOIN ConsomptionTracking ON Consumers.id = ConsomptionTracking.consumer_id AND Consumables.id = ConsomptionTracking.consumable_id
+    WHERE Consumers.qrcode = $qrcode;`
+
+    const db = require("../bin/getDb");
+
+    const {QueryTypes} = require('sequelize');
+
+    const ret_db = await db.query(consumer_info_query, {type : QueryTypes.SELECT, nest : true, bind : {qrcode : req.params.qrcode}});
+
+    let response_data = {}
+
+    response_data = {uuid : consumer.uuid, name : consumer.name, consumables : []};
+    
+    let i = 0;
+    while(ret_db[i] != null ){
+        response_data.consumables[i] = ret_db[i].consumable;
+        i++;
+    }
+    
+    res.status(200).json(response_data);
+
+}
+);
+
+/*
+router.get(
+    '/',
+    query('qrcode'),
+
+async function(req, res, next) {  
+
+    if(!validationResult(req).isEmpty()){
+        res.status(400).json({err : "Bad format"});
+        next()
+    }
+
+    const query = matchedData(req, {locations : ['query'], includeOptionals: true });
+    const consumer = await Consumer.findOne({
+        attributes : ConsumerSchemas.condensed,
+            where: {
+                qrcode: query.qrcode,
             }
         });
 
@@ -122,6 +176,7 @@ async function(req, res, next) {
 
 }
 );
+*/
 
 router.delete('/',
 body('uuid').isUUID(),

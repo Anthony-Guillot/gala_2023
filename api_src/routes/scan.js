@@ -11,7 +11,7 @@ const { Consumer, Consumable, ConsumptionTracking } = require('../model/bddTable
 /* update le nombre de consommations */
 router.patch('/consume',
   body("consumable_uuid").isUUID(),
-  body("consumer_uuid").isUUID(),
+  body("qrcode").isString(),
   async function (req, res, next) {
 
     if (!validationResult(req).isEmpty()) {
@@ -20,7 +20,7 @@ router.patch('/consume',
 
     const body = matchedData(req, { locations: ['body'], includeOptionals: true });
 
-    const check_consumer_exist = await Consumer.findOne({ where: { uuid: body.consumer_uuid } });
+    const check_consumer_exist = await Consumer.findOne({ where: { qrcode: body.qrcode } });
     if (check_consumer_exist == null) {
       return next({message : "This consumer doesn't exists", status : 404});
     }
@@ -35,7 +35,7 @@ router.patch('/consume',
       where: { consumer_id: check_consumer_exist.id, consumable_id: check_consumable_exist.id},
       defaults: {
         consumable_id: check_consumable_exist.id,
-        consumable_id: check_consumer_exist.id,
+        consumer_id: check_consumer_exist.id,
         consumption_count: 0
       }
     });
@@ -51,7 +51,7 @@ router.patch('/consume',
 
     consumption_tracking.increment('consumption_count', { by: 1 });
 
-    res.status(202).json({ id_soiree: req.params.id_soiree, id_utilisateur: req.params.id_consommateur, id_consommation: req.body.id_consommation });
+    res.status(202).json({ id_soiree: req.params.id_soiree, qrcode: req.params.qrcode, id_consommation: req.body.id_consommation });
 
   });
 

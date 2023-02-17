@@ -4,7 +4,7 @@ const PartySchemas = {
 }
 
 const ConsumerSchemas = {
-    condensed : ['uuid', 'name']
+    condensed : ['uuid', 'name', 'qrcode']
 }
 
 const ConsumableSchemas = {

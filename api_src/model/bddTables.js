@@ -50,6 +50,11 @@ const Consumer = sequelize.define('Consumer',
                 model: Party,
                 key: 'id'
             }
+        },
+
+        qrcode: {
+            type: DataTypes.STRING,
+            allowNull: false
         }
 
     })
@@ -119,7 +124,7 @@ const ConsumptionTracking = sequelize.define('ConsomptionTracking',
         consumption_count: {
             type: DataTypes.SMALLINT,
             defaultValue: 0
-        }
+        },
 
     }, { freezeTableName: true });
 
