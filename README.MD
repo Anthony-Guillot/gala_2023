@@ -26,7 +26,7 @@ Pour installer l'API sur un système Linux, suivre la procédure suivante :
 
 Pour exécuter l'API :
 
-`docker-compose up -d`
+`docker-compose up -d --build`
 
 Pour arrêter l'API : 
 
