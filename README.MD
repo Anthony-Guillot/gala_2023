@@ -43,10 +43,28 @@ L'api est accessible à l'adresse suivante :
 
 ### Évenement
 
-| Route              | Méthode            | Paramètres            | Body |
--------------------------------------------------------------------------
-| /Party/	         |  POST              |                       | name : {name}
-                                                                    description (optionnel : test |
--------------------------------------------------------------------------
-| /Party/{uuid}      |  GET               |                       |      |
---------------------------------------------------------------------------
+|Route               |Méthode    |Paramètres |Body                             |
+|---                 |:-:        |:-:        |:-:                              | 
+|/Party/{uuid}       |  GET      |           |                                 |
+|/Party              |  POST     |           |name, description(optionnel)     |
+
+### Consommateur
+
+|Route               |Méthode    |Paramètres            |Body                             |
+|---                 |:-:        |:-:                   |:-:                              | 
+|/consumer/{uuid}    |  GET      |                      |                                 |
+|/consumer/          |  GET      |party_uuid={uuid}     |                                 |
+|/consumer/          |  POST     |                      |name, party_uuid                 |
+
+### Consommables
+
+|Route               |Méthode    |Paramètres            |Body                             |
+|---                 |:-:        |:-:                   |:-:                              | 
+|/consumable/        |  GET      |party_uuid={uuid}     |                                 |
+|/consumable/        |  POST     |                      |name, max_cons, party_uuid       |
+
+### Scan
+
+|Route               |Méthode    |Paramètres            |Body                             |
+|---                 |:-:        |:-:                   |:-:                              | 
+|/scan/consume       |  PATCH    |                      |consumable_uuid, consumable_uuid |
